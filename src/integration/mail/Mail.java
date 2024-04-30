@@ -129,7 +129,7 @@ public class Mail {
      *            ignored.
      * @param attachmentFileNames
      *            Comma separated list of file names to be attached to the email.
-     * @exception MessageingException
+     * @exception MessagingException
      *                If something went wrong.
      */
     public static void sendMessage(String smtpHost, String to, String from, String replyTo, String cc, String bcc,
@@ -227,7 +227,7 @@ public class Mail {
      *            Throw an IOException if the size of the formatted messages exceeds the specified
      *            value. -1 or null indicates unlimited.
      * @return The XML formatted email messages.
-     * @exception MessageingException
+     * @exception MessagingException
      *                If something went wrong, e.g. if the mailbox does not exist.
      */
     public static Element getPOPMessages(String server, String username, String password, boolean returnAttachments,
@@ -295,7 +295,7 @@ public class Mail {
      *    </record>
      * </resultSet>
      *
-     * @param protcol
+     * @param protocol
      *            The mail protocol, i.e. PROTOCOL_IMAP or PROTOCOL_POP
      * @param server
      *            The hostname of the server.
@@ -818,7 +818,7 @@ public class Mail {
     /**
      * Set message body.
      * 
-     * @param messageText
+     * @param newContent
      *            Text of the message.
      */
     private void setContent(String newContent) {
@@ -927,23 +927,23 @@ public class Mail {
         MimeMessage message = new MimeMessage(session);
         message.setSentDate(new Date());
         message.setFrom(_from);
-        message.addRecipients(Message.RecipientType.TO, (Address[]) _to.toArray());
+        message.addRecipients(Message.RecipientType.TO, _to.toArray(new Address[0]));
 
         // optional field: _cc
         if (_cc != null && !_cc.isEmpty()) {
-            message.addRecipients(Message.RecipientType.CC, (Address[]) _cc.toArray());
+            message.addRecipients(Message.RecipientType.CC, _cc.toArray(new Address[0]));
         }
 
         // optional field: _bcc
         if (_bcc != null && !_bcc.isEmpty()) {
-            message.addRecipients(Message.RecipientType.BCC, (Address[]) _bcc.toArray());
+            message.addRecipients(Message.RecipientType.BCC, _bcc.toArray(new Address[0]));
         }
 
         message.setSubject(_subject);
 
         // optional field: _replyTo
         if (_replyTo != null && !_replyTo.isEmpty()) {
-            message.setReplyTo((Address[]) _replyTo.toArray());
+            message.setReplyTo(_replyTo.toArray(new Address[0]));
         }
 
         // add attachments
@@ -986,5 +986,21 @@ public class Mail {
         Transport.send(message);
 
         logger.exiting(CLASS_NAME, METHOD_NAME);
+    }
+
+    public static void main(String[] args) throws MessagingException {
+        String smtpHost = "na.relay.ibm.com";
+
+        String to = "klaus.ulrich@de.ibm.com";
+        String from = "klaus.ulrich@de.ibm.com";
+        String replyTo = "klaus.ulrich@de.ibm.com";
+        String cc = "";
+        String bcc = "";
+        String subject = "Hello there";
+        String contentType = "text/html";
+        String content = "<h1>Hello there, this is an email sent from BAW</h1>";
+        String importance = "";
+        String attachmentFileNames = "";
+        new Mail().sendMessage(smtpHost, to, from, replyTo, cc, bcc, subject, contentType, content, importance, attachmentFileNames);
     }
 }
